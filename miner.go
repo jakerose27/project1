@@ -14,7 +14,7 @@ import (
 	"log"
 	//"math/big"
 	//"math/rand"
-	//"time"
+	"time"
 
 	"github.com/PointCoin/btcjson"
 	"github.com/PointCoin/btcutil"
@@ -74,11 +74,24 @@ func main() {
 		merkleRoot := createMerkleRoot(txs)
 
 		// Finish the miner!
-		
+		t := time.Now()
+		_,_,s := t.Clock()
+		endsec := s + 30
+		if endsec > 59 {
+			endsec = endsec - 60
+		}	
+	
 		block := CreateBlock(prevHash, merkleRoot, difficulty, 0, txs)		
 		//log.Printf("Source: %d", s)
 		var i uint32
-		for i = 0; i<10000000 ; i++ {
+		for i = 0;; i++ {
+			if i%1000 == 0 {
+				t = time.Now()
+				_,_,sec := t.Clock()
+				if sec == endsec {
+					break
+				}
+			}
 			//log.Printf("Nonce number %d", i)
 			block.Header.Nonce = i
 			hash, _err := block.Header.BlockSha()
